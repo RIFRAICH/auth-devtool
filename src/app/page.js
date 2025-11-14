@@ -5,7 +5,6 @@ import { useState } from "react";
 import InputLabel from "@/components/pures/InputLabel";
 import RoundedButton from "@/components/pures/RoundedButton";
 import { login } from "@/lib/auth-client";
-import { useRouter } from "next/navigation";
 
 const HomePage = () => {
   const [email, setEmail] = useState("");
@@ -13,7 +12,7 @@ const HomePage = () => {
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState(null);
   const [token, setToken] = useState(null);
-  const router = useRouter();
+  const [isRegisterMode, setIsRegisterMode] = useState(false);
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -29,14 +28,55 @@ const HomePage = () => {
     }
   };
 
-  const handleGoToRegister = () => {
-    router.push("/register");
+  const handleRegister = async (e) => {
+    e.preventDefault();
+    setErr(null);
+    setLoading(true);
+    try {
+      console.log("Register:", email, password);
+    } catch (e) {
+      setErr("Erreur lors de la création du compte.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSubmit = isRegisterMode ? handleRegister : handleLogin;
+
+  const handleToggle = () => {
+    setIsRegisterMode(!isRegisterMode);
+    setErr(null);
+    setToken(null);
   };
 
   return (
     <main className={styles.container}>
-      <h1 className={styles.title}>Authentification</h1>
-      <form className={styles.form} onSubmit={handleLogin}>
+      <h1 className={styles.title}>
+        {isRegisterMode ? "Créer un compte" : "Authentification"}
+      </h1>
+
+      <div className={styles.toggleWrapper}>
+        <span
+          className={`${styles.toggleLabel} ${!isRegisterMode ? styles.activeLabel : ""}`}
+        >
+          Connexion
+        </span>
+        <label className={styles.switch}>
+          <input
+            type="checkbox"
+            checked={isRegisterMode}
+            onChange={handleToggle}
+          />
+          <span className={styles.slider}></span>
+        </label>
+        <span
+          className={`${styles.toggleLabel} ${isRegisterMode ? styles.activeLabel : ""}`}
+        >
+          Inscription
+        </span>
+      </div>
+
+      <form className={styles.form} onSubmit={handleSubmit}>
         <InputLabel
           className={styles.input}
           id="email"
@@ -58,7 +98,15 @@ const HomePage = () => {
         />
         <RoundedButton
           className={styles.loginButton}
-          text={loading ? "Connexion..." : "Se connecter"}
+          text={
+            loading
+              ? isRegisterMode
+                ? "Création..."
+                : "Connexion..."
+              : isRegisterMode
+                ? "Créer mon compte"
+                : "Se connecter"
+          }
           buttonColor="#1F2BA6"
           textColor="#FFF"
           type="submit"
@@ -70,11 +118,6 @@ const HomePage = () => {
           <p className={styles.errorText}>{err}</p>
         </div>
       )}
-      <RoundedButton
-        className={styles.registerButton}
-        text="Créer un compte"
-        action={handleGoToRegister}
-      />
       {token && (
         <div className={styles.tokenContainer}>
           <h2 className={styles.tokenTitle}>Token généré avec succès ✓</h2>
