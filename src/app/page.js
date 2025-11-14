@@ -5,6 +5,7 @@ import { useState } from "react";
 import InputLabel from "@/components/pures/InputLabel";
 import RoundedButton from "@/components/pures/RoundedButton";
 import { login } from "@/lib/auth-client";
+import { useRouter } from "next/navigation";
 
 const HomePage = () => {
   const [email, setEmail] = useState("");
@@ -12,6 +13,7 @@ const HomePage = () => {
   const [loading, setLoading] = useState(false);
   const [err, setErr] = useState(null);
   const [token, setToken] = useState(null);
+  const router = useRouter();
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -25,6 +27,10 @@ const HomePage = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleGoToRegister = () => {
+    router.push("/register");
   };
 
   return (
@@ -64,6 +70,11 @@ const HomePage = () => {
           <p className={styles.errorText}>{err}</p>
         </div>
       )}
+      <RoundedButton
+        className={styles.registerButton}
+        text="Créer un compte"
+        action={handleGoToRegister}
+      />
       {token && (
         <div className={styles.tokenContainer}>
           <h2 className={styles.tokenTitle}>Token généré avec succès ✓</h2>
