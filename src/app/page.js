@@ -52,7 +52,6 @@ const HomePage = () => {
   };
 
   const handleGoogleLogin = async () => {
-    console.log("Google login clicked");
     setErr(null);
     setLoading(true);
     try {
