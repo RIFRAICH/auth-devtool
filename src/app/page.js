@@ -4,7 +4,8 @@ import styles from "@/styles/pages/HomePage.module.scss";
 import { useState } from "react";
 import InputLabel from "@/components/pures/InputLabel";
 import RoundedButton from "@/components/pures/RoundedButton";
-import { login } from "@/lib/auth-client";
+import { login, loginWithGoogle, signup } from "@/lib/auth-client";
+import { GoogleIcon } from "@/utils/icons";
 
 const HomePage = () => {
   const [email, setEmail] = useState("");
@@ -33,7 +34,8 @@ const HomePage = () => {
     setErr(null);
     setLoading(true);
     try {
-      console.log("Register:", email, password);
+      const token = await signup(email, password);
+      setToken(token);
     } catch (e) {
       setErr("Erreur lors de la création du compte.");
     } finally {
@@ -47,6 +49,21 @@ const HomePage = () => {
     setIsRegisterMode(!isRegisterMode);
     setErr(null);
     setToken(null);
+  };
+
+  const handleGoogleLogin = async () => {
+    console.log("Google login clicked");
+    setErr(null);
+    setLoading(true);
+    try {
+      const token = await loginWithGoogle();
+      setToken(token);
+    } catch (e) {
+      console.error(e);
+      setErr("Erreur lors de la connexion avec Google.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -113,6 +130,15 @@ const HomePage = () => {
           disabled={loading}
         />
       </form>
+      <div className={styles.providerLoginContainer}>
+        <p className={styles.providerLoginText}>ou se connecter avec</p>
+        <button
+          className={styles.providerLoginButton}
+          onClick={handleGoogleLogin}
+        >
+          <GoogleIcon />
+        </button>
+      </div>
       {err && (
         <div className={styles.errorContainer}>
           <p className={styles.errorText}>{err}</p>

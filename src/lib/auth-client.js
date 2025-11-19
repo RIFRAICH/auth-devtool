@@ -5,11 +5,19 @@ import {
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
   sendPasswordResetEmail,
+  GoogleAuthProvider,
+  signInWithPopup,
 } from "firebase/auth";
 
 export async function login(email, password) {
   const cred = await signInWithEmailAndPassword(auth, email, password);
-  return cred.user.getIdToken(true); // JWT
+  return cred.user.getIdToken(true);
+}
+
+export async function loginWithGoogle() {
+  const provider = new GoogleAuthProvider();
+  const cred = await signInWithPopup(auth, provider);
+  return cred.user.getIdToken(true);
 }
 
 export async function signup(email, password) {
