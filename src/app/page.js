@@ -4,8 +4,9 @@ import styles from "@/styles/pages/HomePage.module.scss";
 import { useState } from "react";
 import InputLabel from "@/components/pures/InputLabel";
 import RoundedButton from "@/components/pures/RoundedButton";
-import { login, loginWithGoogle, signup } from "@/lib/auth-client";
+import { login, loginWithGoogle, logout, signup } from "@/lib/auth-client";
 import { GoogleIcon } from "@/utils/icons";
+import { createCurrentUser } from "@/infra/api/endpoints/users";
 
 const HomePage = () => {
   const [email, setEmail] = useState("");
@@ -35,6 +36,8 @@ const HomePage = () => {
     setLoading(true);
     try {
       const token = await signup(email, password);
+      await createCurrentUser();
+      await logout();
       setToken(token);
     } catch (e) {
       setErr("Erreur lors de la création du compte.");
@@ -55,8 +58,13 @@ const HomePage = () => {
     setErr(null);
     setLoading(true);
     try {
-      const token = await loginWithGoogle();
+      const { token, isNewUser } = await loginWithGoogle();
       setToken(token);
+
+      if (isNewUser) {
+        await createCurrentUser();
+        await logout();
+      }
     } catch (e) {
       console.error(e);
       setErr("Erreur lors de la connexion avec Google.");

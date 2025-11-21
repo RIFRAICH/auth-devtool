@@ -5,8 +5,10 @@ import {
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
   sendPasswordResetEmail,
+  signOut,
   GoogleAuthProvider,
   signInWithPopup,
+  getAdditionalUserInfo,
 } from "firebase/auth";
 
 export async function login(email, password) {
@@ -17,7 +19,13 @@ export async function login(email, password) {
 export async function loginWithGoogle() {
   const provider = new GoogleAuthProvider();
   const cred = await signInWithPopup(auth, provider);
-  return cred.user.getIdToken(true);
+
+  const info = getAdditionalUserInfo(cred);
+  const isNewUser = info?.isNewUser ?? false;
+
+  const token = await cred.user.getIdToken(true);
+
+  return { token, isNewUser };
 }
 
 export async function signup(email, password) {
@@ -38,4 +46,8 @@ export async function fetchWithAuth(input, init = {}) {
       ...(token ? { Authorization: `Bearer ${token}` } : {}),
     },
   });
+}
+
+export async function logout() {
+  await signOut(auth);
 }
