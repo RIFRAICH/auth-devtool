@@ -64,8 +64,8 @@ const HomePage = () => {
 
       if (isNewUser) {
         await createCurrentUser();
-        await logout();
       }
+      await logout();
     } catch (e) {
       console.error(e);
       setErr("Erreur lors de la connexion avec Google.");
