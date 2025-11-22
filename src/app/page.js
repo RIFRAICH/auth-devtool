@@ -23,6 +23,7 @@ const HomePage = () => {
     try {
       const token = await login(email, password);
       setToken(token);
+      await logout();
     } catch (e) {
       setErr("Email ou mot de passe incorrect.");
     } finally {
@@ -37,8 +38,8 @@ const HomePage = () => {
     try {
       const token = await signup(email, password);
       await createCurrentUser();
-      await logout();
       setToken(token);
+      await logout();
     } catch (e) {
       setErr("Erreur lors de la création du compte.");
     } finally {
