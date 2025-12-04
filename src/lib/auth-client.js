@@ -5,6 +5,7 @@ import {
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
   sendPasswordResetEmail,
+  sendEmailVerification,
   signOut,
   GoogleAuthProvider,
   signInWithPopup,
@@ -30,6 +31,7 @@ export async function loginWithGoogle() {
 
 export async function signup(email, password) {
   const cred = await createUserWithEmailAndPassword(auth, email, password);
+  await sendEmailVerification(cred.user);
   return cred.user.getIdToken(true);
 }
 
